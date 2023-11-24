@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Tambahkan link CSS Bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <title>Bootstrap Navbar with Dropdown</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css"><link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/MarkerCluster.css">
+        <link rel="stylesheet" href="css/MarkerCluster.Default.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="#">
+  <img src="D:\Nyanya\Coba Popup Footo\qgis2web_2023_11_21-19_30_19_692034\LOGO.png" width="50" height="50" class="d-inline-block align-top" alt="">
+   Kabupaten Pasuruan
+    </a>
+  
+  <!-- Tombol toggle untuk tampilan mobile -->
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  
+  <!-- Daftar menu navbar -->
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">News</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Kondisi Jalan
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="#">Jalan Kabupaten</a>
+          <a class="dropdown-item" href="#">Jalan Desa</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Kondisi Jembatan
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="#">Peta</a>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="https://www.lapor.go.id/" target="_blank">Pengaduan</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+        <div id="map">
+        </div>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script><script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="js/leaflet.markercluster.js"></script>
+        <script src="data/Sampel_Jembatan_1.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[-8.01914856951711,114.26286912747206],[-7.845692157708381,114.49142503169806]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_GoogleSatellite_0');
+        map.getPane('pane_GoogleSatellite_0').style.zIndex = 400;
+        var layer_GoogleSatellite_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleSatellite_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 18
+        });
+        layer_GoogleSatellite_0;
+        map.addLayer(layer_GoogleSatellite_0);
+        function pop_Sampel_Jembatan_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>Kode</strong><br />' + (feature.properties['Kode'] !== null ? autolinker.link(feature.properties['Kode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>NOMOR_ID</strong><br />' + (feature.properties['NOMOR_ID'] !== null ? autolinker.link(feature.properties['NOMOR_ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>NOMOR_SK</strong><br />' + (feature.properties['NOMOR_SK'] !== null ? autolinker.link(feature.properties['NOMOR_SK'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>NAMA_RUAS</strong><br />' + (feature.properties['NAMA_RUAS'] !== null ? autolinker.link(feature.properties['NAMA_RUAS'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>NOMOR_JEMB</strong><br />' + (feature.properties['NOMOR_JEMB'] !== null ? autolinker.link(feature.properties['NOMOR_JEMB'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>NAMA_JEMBA</strong><br />' + (feature.properties['NAMA_JEMBA'] !== null ? autolinker.link(feature.properties['NAMA_JEMBA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>KOORDINAT</strong><br />' + (feature.properties['KOORDINAT'] !== null ? autolinker.link(feature.properties['KOORDINAT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>KOORDINA_1</strong><br />' + (feature.properties['KOORDINA_1'] !== null ? autolinker.link(feature.properties['KOORDINA_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>DESA</strong><br />' + (feature.properties['DESA'] !== null ? autolinker.link(feature.properties['DESA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>KECAMATAN</strong><br />' + (feature.properties['KECAMATAN'] !== null ? autolinker.link(feature.properties['KECAMATAN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>KMPOST__km</strong><br />' + (feature.properties['KMPOST__km'] !== null ? autolinker.link(feature.properties['KMPOST__km'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>TAHUN_PEMB</strong><br />' + (feature.properties['TAHUN_PEMB'] !== null ? autolinker.link(feature.properties['TAHUN_PEMB'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>PANJANG__m</strong><br />' + (feature.properties['PANJANG__m'] !== null ? autolinker.link(feature.properties['PANJANG__m'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>LEBAR__m_</strong><br />' + (feature.properties['LEBAR__m_'] !== null ? autolinker.link(feature.properties['LEBAR__m_'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>TINGGI_JEM</strong><br />' + (feature.properties['TINGGI_JEM'] !== null ? autolinker.link(feature.properties['TINGGI_JEM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>JUMLAH_BEN</strong><br />' + (feature.properties['JUMLAH_BEN'] !== null ? autolinker.link(feature.properties['JUMLAH_BEN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>TIPE_BA__K</strong><br />' + (feature.properties['TIPE_BA__K'] !== null ? autolinker.link(feature.properties['TIPE_BA__K'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>TIPE_BA</strong><br />' + (feature.properties['TIPE_BA'] !== null ? autolinker.link(feature.properties['TIPE_BA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>KONDISI_BA</strong><br />' + (feature.properties['KONDISI_BA'] !== null ? autolinker.link(feature.properties['KONDISI_BA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>TIPE_BB__K</strong><br />' + (feature.properties['TIPE_BB__K'] !== null ? autolinker.link(feature.properties['TIPE_BB__K'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>TIPE_BB</strong><br />' + (feature.properties['TIPE_BB'] !== null ? autolinker.link(feature.properties['TIPE_BB'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>KONDISI_BB</strong><br />' + (feature.properties['KONDISI_BB'] !== null ? autolinker.link(feature.properties['KONDISI_BB'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>TIPE_FONDA</strong><br />' + (feature.properties['TIPE_FONDA'] !== null ? autolinker.link(feature.properties['TIPE_FONDA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>TIPE_FON_1</strong><br />' + (feature.properties['TIPE_FON_1'] !== null ? autolinker.link(feature.properties['TIPE_FON_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>KONDISI_FO</strong><br />' + (feature.properties['KONDISI_FO'] !== null ? autolinker.link(feature.properties['KONDISI_FO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>TIPE_LANTA</strong><br />' + (feature.properties['TIPE_LANTA'] !== null ? autolinker.link(feature.properties['TIPE_LANTA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>TIPE_LAN_1</strong><br />' + (feature.properties['TIPE_LAN_1'] !== null ? autolinker.link(feature.properties['TIPE_LAN_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>KONDISI_LA</strong><br />' + (feature.properties['KONDISI_LA'] !== null ? autolinker.link(feature.properties['KONDISI_LA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>TIPE_LAN_2</strong><br />' + (feature.properties['TIPE_LAN_2'] !== null ? autolinker.link(feature.properties['TIPE_LAN_2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>TIPE_LAN_3</strong><br />' + (feature.properties['TIPE_LAN_3'] !== null ? autolinker.link(feature.properties['TIPE_LAN_3'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>KONDISI__1</strong><br />' + (feature.properties['KONDISI__1'] !== null ? autolinker.link(feature.properties['KONDISI__1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>RATA_RATA</strong><br />' + (feature.properties['RATA_RATA'] !== null ? autolinker.link(feature.properties['RATA_RATA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>KONDISI_RA</strong><br />' + (feature.properties['KONDISI_RA'] !== null ? autolinker.link(feature.properties['KONDISI_RA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>SARAN_PENA</strong><br />' + (feature.properties['SARAN_PENA'] !== null ? autolinker.link(feature.properties['SARAN_PENA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>FOTO</strong><br />' + (feature.properties['FOTO'] !== null ? '<img src="images/' + String(feature.properties['FOTO']).replace(/[\\\/:]/g, '_').trim() + '">' : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_Sampel_Jembatan_1_0(feature) {
+            switch(String(feature.properties['KONDISI_RA'])) {
+                case 'RUSAK BERAT':
+                    return {
+                pane: 'pane_Sampel_Jembatan_1',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(128,17,25,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(215,25,28,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'RUSAK RINGAN':
+                    return {
+                pane: 'pane_Sampel_Jembatan_1',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(128,17,25,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'RUSAK SEDANG':
+                    return {
+                pane: 'pane_Sampel_Jembatan_1',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(128,17,25,0.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(199,233,173,1.0)',
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_Sampel_Jembatan_1',
+                radius: 8.0,
+                opacity: 1,
+                color: 'rgba(128,17,25,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(43,131,186,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Sampel_Jembatan_1');
+        map.getPane('pane_Sampel_Jembatan_1').style.zIndex = 401;
+        map.getPane('pane_Sampel_Jembatan_1').style['mix-blend-mode'] = 'normal';
+        var layer_Sampel_Jembatan_1 = new L.geoJson(json_Sampel_Jembatan_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Sampel_Jembatan_1',
+            layerName: 'layer_Sampel_Jembatan_1',
+            pane: 'pane_Sampel_Jembatan_1',
+            onEachFeature: pop_Sampel_Jembatan_1,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Sampel_Jembatan_1_0(feature));
+            },
+        });
+        var cluster_Sampel_Jembatan_1 = new L.MarkerClusterGroup({showCoverageOnHover: false,
+            spiderfyDistanceMultiplier: 2});
+        cluster_Sampel_Jembatan_1.addLayer(layer_Sampel_Jembatan_1);
+
+        bounds_group.addLayer(layer_Sampel_Jembatan_1);
+        cluster_Sampel_Jembatan_1.addTo(map);
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'Sampel_Jembatan<br /><table><tr><td style="text-align: center;"><img src="legend/Sampel_Jembatan_1_RUSAKBERAT0.png" /></td><td>RUSAK BERAT</td></tr><tr><td style="text-align: center;"><img src="legend/Sampel_Jembatan_1_RUSAKRINGAN1.png" /></td><td>RUSAK RINGAN</td></tr><tr><td style="text-align: center;"><img src="legend/Sampel_Jembatan_1_RUSAKSEDANG2.png" /></td><td>RUSAK SEDANG</td></tr><tr><td style="text-align: center;"><img src="legend/Sampel_Jembatan_1_3.png" /></td><td></td></tr></table>': cluster_Sampel_Jembatan_1,"Google Satellite": layer_GoogleSatellite_0,}).addTo(map);
+        setBounds();
+        </script>
+    </body>
+</html>
